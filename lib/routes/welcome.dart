@@ -42,11 +42,13 @@ class _WelcomeState extends State<Welcome> {
             Spacer(),
             Padding(
               padding: const EdgeInsets.all(40.0),
-              child: Image.network('https://images-na.ssl-images-amazon.com/images/I/417MahKs6fL.png'),
+              child: Image.network(
+                  'https://images-na.ssl-images-amazon.com/images/I/417MahKs6fL.png'),
             ),
             Spacer(),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
               child: Row(
                 children: <Widget>[
                   Expanded(
@@ -54,6 +56,7 @@ class _WelcomeState extends State<Welcome> {
                     child: OutlinedButton(
                       onPressed: () {
                         //TODO: Navigate
+                        Navigator.pushNamed(context, '/signup');
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -67,15 +70,15 @@ class _WelcomeState extends State<Welcome> {
                       ),
                     ),
                   ),
-
-                  SizedBox(width: 8.0,),
-
+                  SizedBox(
+                    width: 8.0,
+                  ),
                   Expanded(
                     flex: 1,
                     child: OutlinedButton(
                       onPressed: () {
                         //TODO: Navigate
-
+                        Navigator.pushNamed(context, '/login');
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -85,7 +88,7 @@ class _WelcomeState extends State<Welcome> {
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                        backgroundColor: AppColors.primary,
                       ),
                     ),
                   ),

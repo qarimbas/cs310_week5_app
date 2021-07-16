@@ -9,8 +9,17 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  int attemptCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    print('initState called');
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('Build called');
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -30,12 +39,14 @@ class _LoginState extends State<Login> {
               flex: 1,
               child: OutlinedButton(
                 onPressed: () {
-                  //TODO: setState()
+                  setState(() {
+                    attemptCount++;
+                  });
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: Text(
-                    'Login Attempt: ',
+                    'Login Attempt: $attemptCount',
                     style: kButtonDarkTextStyle,
                   ),
                 ),
