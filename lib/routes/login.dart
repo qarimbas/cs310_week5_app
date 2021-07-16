@@ -9,12 +9,26 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  int attemptCount = 0;
+  int attemptCount;
+
+  void getData() async {
+    String name = await Future.delayed(Duration(seconds: 5), () {
+      return 'B. Kerem KURT';
+    });
+
+    String uni = await Future.delayed(Duration(seconds: 2), () {
+      return 'Sabanci University';
+    });
+
+    print('$name: $uni');
+  }
 
   @override
   void initState() {
     super.initState();
     print('initState called');
+    attemptCount = 0;
+    getData();
   }
 
   @override
