@@ -1,6 +1,7 @@
 import 'package:cs310_week5_app/utils/color.dart';
 import 'package:cs310_week5_app/utils/dimension.dart';
 import 'package:cs310_week5_app/utils/styles.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -11,6 +12,9 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   int attemptCount;
+  String mail;
+  String pass;
+  final _formKey = GlobalKey<FormState>();
 
   Future<void> showDialogBox(String title, String message) async {
     return showDialog<void>(
@@ -72,44 +76,120 @@ class _LoginState extends State<Login> {
       body: Padding(
         padding: Dimen.regularPadding,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-              'You have pushed the button this many times:',
-              style: GoogleFonts.oswald(
-                  textStyle: Theme.of(context).textTheme.headline4),
-            ),
-            Text(
-              '$attemptCount',
-              style: GoogleFonts.lato(
-                  fontStyle: FontStyle.italic,
-                  textStyle: Theme.of(context).textTheme.headline4),
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      showDialogBox('Action', 'Button Clicked');
-                      setState(() {
-                        attemptCount++;
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: Text(
-                        'Login Attempt: $attemptCount',
-                        style: kButtonDarkTextStyle,
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            fillColor: AppColors.secondary,
+                            filled: true,
+                            hintText: 'E-mail',
+                            //labelText: 'Username',
+                            labelStyle: kLabelLightTextStyle,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.primary),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30.0)),
+                            ),
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter your e-mail';
+                            }
+                            if (!EmailValidator.validate(value)) {
+                              return 'The e-mail address is not valid';
+                            }
+                            return null;
+                          },
+                          onSaved: (String value) {
+                            mail = value;
+                          },
+                        ),
                       ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                    ),
+                    ],
                   ),
-                ),
-              ],
+                  SizedBox(height: 16.0),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            fillColor: AppColors.secondary,
+                            filled: true,
+                            hintText: 'Password',
+                            //labelText: 'Username',
+                            labelStyle: kLabelLightTextStyle,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.primary),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30.0)),
+                            ),
+                          ),
+                          keyboardType: TextInputType.text,
+                          obscureText: true,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter your password';
+                            }
+                            if (value.length < 8) {
+                              return 'Password must be at least 8 characters';
+                            }
+                            return null;
+                          },
+                          onSaved: (String value) {
+                            pass = value;
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.0),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(
+                        flex: 1,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            if (_formKey.currentState.validate()) {
+                              _formKey.currentState.save();
+                              showDialogBox('Action', 'Button Clicked');
+                              setState(() {
+                                attemptCount++;
+                              });
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: Text('Logging in...'),
+                              ));
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            child: Text(
+                              'Login',
+                              style: kButtonDarkTextStyle,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),

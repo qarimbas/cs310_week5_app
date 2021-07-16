@@ -14,6 +14,11 @@ final kButtonLightTextStyle = TextStyle(
   letterSpacing: -0.7,
 );
 
+final kLabelLightTextStyle = TextStyle(
+  color: AppColors.textColor,
+  fontSize: 13.0,
+);
+
 final kButtonDarkTextStyle = TextStyle(
   color: Colors.white,
   fontSize: 20.0,
