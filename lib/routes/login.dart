@@ -1,3 +1,4 @@
+import 'package:cs310_week5_app/utils/api.dart';
 import 'package:cs310_week5_app/utils/color.dart';
 import 'package:cs310_week5_app/utils/dimension.dart';
 import 'package:cs310_week5_app/utils/styles.dart';
@@ -6,6 +7,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:io' show Platform;
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Login extends StatefulWidget {
   @override
@@ -17,6 +20,30 @@ class _LoginState extends State<Login> {
   String mail;
   String pass;
   final _formKey = GlobalKey<FormState>();
+
+  void getPosts() async {
+    final url = Uri.parse(API.postsURL + '1');
+
+    final response = await http.get(
+      Uri.https(url.authority, url.path),
+      headers: <String, String>{
+        "Accept": "application/json",
+        "Content-Type": "charset=UTF-8",
+      },
+    );
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      print(response.body);
+      showDialogBox('HTTP Error ${response.statusCode}', 'Posts Loaded');
+
+      Map<String, dynamic> postOne = jsonDecode(response.body);
+      print(postOne.toString());
+    } else if (response.statusCode >= 400) {
+      print(response.body);
+      showDialogBox('HTTP Error ${response.statusCode}', '${response.body}');
+    }
+    print(response.toString());
+  }
 
   Future<void> showDialogBox(String title, String message) async {
     bool isIOS = Platform.isIOS;
@@ -188,6 +215,7 @@ class _LoginState extends State<Login> {
                         flex: 1,
                         child: OutlinedButton(
                           onPressed: () {
+                            getPosts();
                             if (_formKey.currentState.validate()) {
                               _formKey.currentState.save();
                               showDialogBox('Action', 'Button Clicked');
