@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:cs310_week5_app/utils/dimension.dart';
 import 'package:cs310_week5_app/utils/styles.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:cs310_week5_app/utils/color.dart';
+import 'package:http/http.dart' as http;
 
 class SignUp extends StatefulWidget {
   @override
@@ -10,24 +13,67 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  int attemptCount;
-  String mail;
-  String pass;
-  String pass2;
-  String userName;
+  int attemptCount = 0;
+  String mail = '';
+  String pass = '';
+  String pass2 = '';
+  String userName = '';
   final _formKey = GlobalKey<FormState>();
 
-  Future<void> showDialogBox(String title, String message) async {
+  Future<void> signUpUser() async {
+    final url = Uri.parse('http://altop.co/cs310/api.php');
+    var body = {
+      'call': 'signup',
+      'mail': mail,
+      'pass': pass,
+      'username': userName
+    };
+
+    final response = await http.post(
+      Uri.http(url.authority, url.path),
+      headers: <String, String>{
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+      },
+      body: body,
+      encoding: Encoding.getByName("utf-8"),
+    );
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      //Successful transmission
+      Map<String, dynamic> jsonMap = json.decode(response.body);
+
+      for (var entry in jsonMap.entries) {
+        print("${entry.key} ==> ${entry.value}");
+      }
+    } else if (response.statusCode >= 400 && response.statusCode < 500) {
+      Map<String, dynamic> jsonMap = json.decode(response.body);
+
+      for (var entry in jsonMap.entries) {
+        print("${entry.key} ==> ${entry.value}");
+      }
+
+      showAlertDialog('WARNING', jsonMap['error_msg']);
+    } else {
+      print(response.body.toString());
+      print(response.statusCode);
+      showAlertDialog('WARNING', 'Response was not recognized');
+    }
+  }
+
+  Future<void> showAlertDialog(String title, String message) async {
     return showDialog<void>(
         context: context,
-        barrierDismissible: false,
+        barrierDismissible: false, //User must tap button
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text(title),
             content: SingleChildScrollView(
-              child: ListBody(children: [
-                Text(message),
-              ]),
+              child: ListBody(
+                children: [
+                  Text(message),
+                ],
+              ),
             ),
             actions: [
               TextButton(
@@ -81,22 +127,25 @@ class _SignUpState extends State<SignUp> {
                           ),
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
-                            if (value.isEmpty) {
+                            mail = value ?? '';
+                            if (mail.isEmpty) {
                               return 'Please enter your e-mail';
                             }
-                            if (!EmailValidator.validate(value)) {
+                            if (!EmailValidator.validate(mail)) {
                               return 'The e-mail address is not valid';
                             }
                             return null;
                           },
-                          onSaved: (String value) {
-                            mail = value;
+                          onSaved: (String? value) {
+                            mail = value ?? '';
                           },
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 16.0),
+                  SizedBox(
+                    height: 16.0,
+                  ),
                   Row(
                     children: [
                       Expanded(
@@ -116,22 +165,25 @@ class _SignUpState extends State<SignUp> {
                           ),
                           keyboardType: TextInputType.text,
                           validator: (value) {
-                            if (value.isEmpty) {
-                              return 'Please enter your username';
+                            userName = value ?? '';
+                            if (userName.isEmpty) {
+                              return 'Please enter your e-mail';
                             }
-                            if (value.length < 4) {
-                              return 'username is too short';
+                            if (userName.length < 4) {
+                              return 'Username is too short';
                             }
                             return null;
                           },
-                          onSaved: (String value) {
-                            userName = value;
+                          onSaved: (String? value) {
+                            userName = value ?? '';
                           },
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 16.0),
+                  SizedBox(
+                    height: 16.0,
+                  ),
                   Row(
                     children: [
                       Expanded(
@@ -154,16 +206,17 @@ class _SignUpState extends State<SignUp> {
                           enableSuggestions: false,
                           autocorrect: false,
                           validator: (value) {
-                            if (value.isEmpty) {
+                            pass = value ?? '';
+                            if (pass.isEmpty) {
                               return 'Please enter your password';
                             }
-                            if (value.length < 8) {
+                            if (pass.length < 8) {
                               return 'Password must be at least 8 characters';
                             }
                             return null;
                           },
-                          onSaved: (String value) {
-                            pass = value;
+                          onSaved: (String? value) {
+                            pass = value ?? '';
                           },
                         ),
                       ),
@@ -188,22 +241,26 @@ class _SignUpState extends State<SignUp> {
                           enableSuggestions: false,
                           autocorrect: false,
                           validator: (value) {
-                            if (value.isEmpty) {
+                            pass2 = value ?? '';
+
+                            if (pass2.isEmpty) {
                               return 'Please enter your password';
                             }
-                            if (value.length < 8) {
+                            if (pass2.length < 8) {
                               return 'Password must be at least 8 characters';
                             }
                             return null;
                           },
-                          onSaved: (String value) {
-                            pass2 = value;
+                          onSaved: (String? value) {
+                            pass2 = value ?? '';
                           },
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 16.0),
+                  SizedBox(
+                    height: 16,
+                  ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
@@ -211,20 +268,22 @@ class _SignUpState extends State<SignUp> {
                         flex: 1,
                         child: OutlinedButton(
                           onPressed: () {
-                            if (_formKey.currentState.validate()) {
-                              _formKey.currentState.save();
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+
                               if (pass != pass2) {
-                                showDialogBox('Error', 'Passwords must match');
+                                showAlertDialog(
+                                    "Error", 'Passwords must match');
                               } else {
-                                //TODO: Sign up process
+                                signUpUser();
                               }
+                              //
                               setState(() {
-                                attemptCount++;
+                                attemptCount += 1;
                               });
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text('Signing in...'),
-                              ));
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Signing up')));
                             }
                           },
                           child: Padding(

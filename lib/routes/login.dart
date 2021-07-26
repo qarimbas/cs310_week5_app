@@ -2,10 +2,10 @@ import 'package:cs310_week5_app/utils/api.dart';
 import 'package:cs310_week5_app/utils/color.dart';
 import 'package:cs310_week5_app/utils/dimension.dart';
 import 'package:cs310_week5_app/utils/styles.dart';
+import 'package:cs310_week5_app/model/postItem.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -16,13 +16,14 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  int attemptCount;
-  String mail;
-  String pass;
+  int attemptCount = 0;
+  String mail = '';
+  String pass = '';
   final _formKey = GlobalKey<FormState>();
 
   void getPosts() async {
-    final url = Uri.parse(API.postsURL + '1');
+    //final url = Uri.parse(API.postsURL + '1');
+    final url = Uri.parse(API.postsURL);
 
     final response = await http.get(
       Uri.https(url.authority, url.path),
@@ -33,49 +34,42 @@ class _LoginState extends State<Login> {
     );
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      print(response.body);
-      showDialogBox('HTTP Error ${response.statusCode}', 'Posts Loaded');
+      //SUCCESS
+      // print(response.body);
+      // showAlertDialog('HTTP Success ${response.statusCode}', 'Posts loaded');
 
-      Map<String, dynamic> postOne = jsonDecode(response.body);
-      print(postOne.toString());
+      // Map<String, dynamic> postOne = jsonDecode(response.body);
+      // print('User ID: ${postOne['userId']}');
+      // print('Title: ${postOne['title']}');
+
+      // PostItem postOne = PostItem.fromJson(jsonDecode(response.body));
+      // print(postOne.title);
+
+      var responseList = jsonDecode(response.body) as List;
+      List<PostItem> items =
+          responseList.map((jsonItem) => PostItem.fromJson(jsonItem)).toList();
+
+      print(items[37].title);
     } else if (response.statusCode >= 400) {
       print(response.body);
-      showDialogBox('HTTP Error ${response.statusCode}', '${response.body}');
+      showAlertDialog('HTTP Error ${response.statusCode}', '${response.body}');
     }
-    print(response.toString());
   }
 
-  Future<void> showDialogBox(String title, String message) async {
+  Future<void> showAlertDialog(String title, String message) async {
     bool isIOS = Platform.isIOS;
 
-    if (isIOS) {
-      return CupertinoAlertDialog(
-        title: Text(title),
-        content: Column(
-          children: [
-            Text('message'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            child: Text('OK'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    } else {
-      return showDialog<void>(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return AlertDialog(
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: false, //User must tap button
+        builder: (BuildContext context) {
+          if (isIOS) {
+            return CupertinoAlertDialog(
               title: Text(title),
-              content: SingleChildScrollView(
-                child: ListBody(children: [
+              content: Column(
+                children: [
                   Text(message),
-                ]),
+                ],
               ),
               actions: [
                 TextButton(
@@ -86,8 +80,27 @@ class _LoginState extends State<Login> {
                 ),
               ],
             );
-          });
-    }
+          } else {
+            return AlertDialog(
+              title: Text(title),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: [
+                    Text(message),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          }
+        });
   }
 
   void getData() async {
@@ -151,16 +164,23 @@ class _LoginState extends State<Login> {
                           ),
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
-                            if (value.isEmpty) {
+                            if (value == null) {
                               return 'Please enter your e-mail';
+                            } else {
+                              if (value.isEmpty) {
+                                return 'Please enter your e-mail';
+                              }
+                              if (!EmailValidator.validate(value)) {
+                                return 'The e-mail address is not valid';
+                              }
                             }
-                            if (!EmailValidator.validate(value)) {
-                              return 'The e-mail address is not valid';
-                            }
+
                             return null;
                           },
-                          onSaved: (String value) {
-                            mail = value;
+                          onSaved: (value) {
+                            if (value != null) {
+                              mail = value;
+                            }
                           },
                           onChanged: (String value) {
                             mail = value;
@@ -169,7 +189,9 @@ class _LoginState extends State<Login> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16.0),
+                  SizedBox(
+                    height: 16.0,
+                  ),
                   Row(
                     children: [
                       Expanded(
@@ -192,22 +214,29 @@ class _LoginState extends State<Login> {
                           enableSuggestions: false,
                           autocorrect: false,
                           validator: (value) {
-                            if (value.isEmpty) {
+                            if (value == null) {
                               return 'Please enter your password';
+                            } else {
+                              if (value.isEmpty) {
+                                return 'Please enter your password';
+                              }
+                              if (value.length < 8) {
+                                return 'Password must be at least 8 characters';
+                              }
                             }
-                            if (value.length < 8) {
-                              return 'Password must be at least 8 characters';
-                            }
+
                             return null;
                           },
-                          onSaved: (String value) {
-                            pass = value;
+                          onSaved: (String? value) {
+                            pass = value ?? '';
                           },
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 16.0),
+                  SizedBox(
+                    height: 16,
+                  ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
@@ -215,17 +244,18 @@ class _LoginState extends State<Login> {
                         flex: 1,
                         child: OutlinedButton(
                           onPressed: () {
+                            //showAlertDialog("Action", 'Button clicked');
                             getPosts();
-                            if (_formKey.currentState.validate()) {
-                              _formKey.currentState.save();
-                              showDialogBox('Action', 'Button Clicked');
+
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+
                               setState(() {
-                                attemptCount++;
+                                attemptCount += 1;
                               });
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text('Logging in...'),
-                              ));
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Logging in')));
                             }
                           },
                           child: Padding(
