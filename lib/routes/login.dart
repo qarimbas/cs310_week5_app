@@ -2,8 +2,10 @@ import 'package:cs310_week5_app/utils/color.dart';
 import 'package:cs310_week5_app/utils/dimension.dart';
 import 'package:cs310_week5_app/utils/styles.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:io' show Platform;
 
 class Login extends StatefulWidget {
   @override
@@ -17,27 +19,48 @@ class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
 
   Future<void> showDialogBox(String title, String message) async {
-    return showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(title),
-            content: SingleChildScrollView(
-              child: ListBody(children: [
-                Text(message),
-              ]),
-            ),
-            actions: [
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+    bool isIOS = Platform.isIOS;
+
+    if (isIOS) {
+      return CupertinoAlertDialog(
+        title: Text(title),
+        content: Column(
+          children: [
+            Text('message'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    } else {
+      return showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(title),
+              content: SingleChildScrollView(
+                child: ListBody(children: [
+                  Text(message),
+                ]),
               ),
-            ],
-          );
-        });
+              actions: [
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          });
+    }
   }
 
   void getData() async {
@@ -110,6 +133,9 @@ class _LoginState extends State<Login> {
                             return null;
                           },
                           onSaved: (String value) {
+                            mail = value;
+                          },
+                          onChanged: (String value) {
                             mail = value;
                           },
                         ),
