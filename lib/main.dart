@@ -13,3 +13,5 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(Wrapper());
 }
+
+void test() {}
