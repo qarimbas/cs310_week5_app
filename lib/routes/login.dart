@@ -1,8 +1,10 @@
+import 'package:cs310_week5_app/routes/home.dart';
 import 'package:cs310_week5_app/utils/api.dart';
 import 'package:cs310_week5_app/utils/color.dart';
 import 'package:cs310_week5_app/utils/dimension.dart';
 import 'package:cs310_week5_app/utils/styles.dart';
 import 'package:cs310_week5_app/model/postItem.dart';
+import 'package:cs310_week5_app/routes/home.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,8 @@ class _LoginState extends State<Login> {
   String mail = '';
   String pass = '';
   final _formKey = GlobalKey<FormState>();
+
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   void getPosts() async {
     //final url = Uri.parse(API.postsURL + '1');
@@ -116,12 +120,40 @@ class _LoginState extends State<Login> {
     print('$name: $uni');
   }
 
+  Future<void> signIn() async {
+    try {
+      UserCredential uc =
+          await auth.signInWithEmailAndPassword(email: mail, password: pass);
+    } on FirebaseAuthException catch (e) {
+      print(e.toString());
+      if (e.code == 'invalid-email') {
+        showAlertDialog('Oops', 'The email adress $mail is invalid');
+      } else if (e.code == 'user-disabled') {
+        showAlertDialog('Oops', 'Your account is disabled');
+      } else if (e.code == 'wrong-password') {
+        showAlertDialog('Oops', 'Your password is incorrect');
+      } else if (e.code == 'user-not-found') {
+        showAlertDialog(
+            'Oops', 'No such account is found, please register to the app');
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     print('initState called');
     attemptCount = 0;
     getData();
+
+    auth.authStateChanges().listen((user) {
+      if (user == null) {
+        print('User is signed out');
+      } else {
+        print('User signed in: ${user.uid}');
+        Navigator.pushNamed(context, '/home');
+      }
+    });
   }
 
   @override
@@ -246,10 +278,11 @@ class _LoginState extends State<Login> {
                         child: OutlinedButton(
                           onPressed: () {
                             //showAlertDialog("Action", 'Button clicked');
-                            getPosts();
+                            //getPosts();
 
                             if (_formKey.currentState!.validate()) {
                               _formKey.currentState!.save();
+                              signIn();
 
                               setState(() {
                                 attemptCount += 1;

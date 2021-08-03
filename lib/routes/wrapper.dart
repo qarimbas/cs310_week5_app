@@ -1,3 +1,4 @@
+import 'package:cs310_week5_app/routes/home.dart';
 import 'package:cs310_week5_app/routes/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -24,6 +25,7 @@ class Wrapper extends StatelessWidget {
             routes: {
               '/login': (context) => Login(),
               '/signup': (context) => SignUp(),
+              '/home': (context) => HomeView(),
             },
           );
         }
