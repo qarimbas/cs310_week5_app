@@ -127,14 +127,13 @@ class _LoginState extends State<Login> {
     } on FirebaseAuthException catch (e) {
       print(e.toString());
       if (e.code == 'invalid-email') {
-        showAlertDialog('Oops', 'The email adress $mail is invalid');
+        showAlertDialog('Oops', '${e.message}');
       } else if (e.code == 'user-disabled') {
-        showAlertDialog('Oops', 'Your account is disabled');
+        showAlertDialog('Oops', '${e.message}');
       } else if (e.code == 'wrong-password') {
-        showAlertDialog('Oops', 'Your password is incorrect');
+        showAlertDialog('Oops', '${e.message}');
       } else if (e.code == 'user-not-found') {
-        showAlertDialog(
-            'Oops', 'No such account is found, please register to the app');
+        showAlertDialog('Oops', '${e.message}');
       }
     }
   }

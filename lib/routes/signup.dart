@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cs310_week5_app/utils/dimension.dart';
 import 'package:cs310_week5_app/utils/styles.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cs310_week5_app/utils/color.dart';
 import 'package:http/http.dart' as http;
@@ -19,6 +20,26 @@ class _SignUpState extends State<SignUp> {
   String pass2 = '';
   String userName = '';
   final _formKey = GlobalKey<FormState>();
+
+  FirebaseAuth auth = FirebaseAuth.instance;
+
+  Future<void> signUpWithFirebase() async {
+    try {
+      UserCredential uc = await auth.createUserWithEmailAndPassword(
+          email: mail, password: pass);
+    } on FirebaseAuthException catch (e) {
+      print(e.toString());
+      if (e.code == 'email-already-in-use') {
+        showAlertDialog('Oops', '${e.message}');
+      } else if (e.code == 'invalid-email') {
+        showAlertDialog('Oops', '${e.message}');
+      } else if (e.code == 'operation-not-allowed') {
+        showAlertDialog('Oops', '${e.message}');
+      } else if (e.code == 'weak-password') {
+        showAlertDialog('Oops', '${e.message}');
+      }
+    }
+  }
 
   Future<void> signUpUser() async {
     final url = Uri.parse('http://altop.co/cs310/api.php');
@@ -85,6 +106,18 @@ class _SignUpState extends State<SignUp> {
             ],
           );
         });
+  }
+
+  @override
+  void initState() {
+    auth.authStateChanges().listen((user) {
+      if (user == null) {
+      } else {
+        Navigator.pushNamed(context, '/home');
+      }
+    });
+
+    super.initState();
   }
 
   @override
@@ -275,7 +308,7 @@ class _SignUpState extends State<SignUp> {
                                 showAlertDialog(
                                     "Error", 'Passwords must match');
                               } else {
-                                signUpUser();
+                                signUpWithFirebase();
                               }
                               //
                               setState(() {
