@@ -1,5 +1,7 @@
 import 'package:cs310_week5_app/routes/home.dart';
 import 'package:cs310_week5_app/routes/welcome.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cs310_week5_app/routes/welcome.dart';
@@ -20,16 +22,32 @@ class Wrapper extends StatelessWidget {
           );
         }
         if (snapshot.connectionState == ConnectionState.done) {
-          return MaterialApp(
-            home: Welcome(),
-            routes: {
-              '/login': (context) => Login(),
-              '/signup': (context) => SignUp(),
-              '/home': (context) => HomeView(),
-            },
-          );
+          return AppBase();
         }
         return MaterialApp(home: WaitingView());
+      },
+    );
+  }
+}
+
+class AppBase extends StatelessWidget {
+  const AppBase({
+    Key? key,
+  }) : super(key: key);
+
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Welcome(),
+      navigatorObservers: [observer],
+      routes: {
+        '/login': (context) => Login(),
+        '/signup': (context) => SignUp(),
+        '/home': (context) => HomeView(analytics: analytics),
       },
     );
   }
