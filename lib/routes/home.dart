@@ -12,26 +12,31 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'LOGIN',
-          style: kAppBarTitleTextStyle,
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'LOGIN',
+            style: kAppBarTitleTextStyle,
+          ),
+          backgroundColor: AppColors.primary,
+          centerTitle: true,
+          elevation: 0.0,
+          leading: Container(),
+          actions: [
+            IconButton(
+                onPressed: () async {
+                  signOut();
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.logout)),
+          ],
         ),
-        backgroundColor: AppColors.primary,
-        centerTitle: true,
-        elevation: 0.0,
-        leading: Container(),
-        actions: [
-          IconButton(
-              onPressed: () async {
-                signOut();
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.logout)),
-        ],
+        body: Center(child: Text('Welcome home')),
       ),
-      body: Center(child: Text('Welcome home')),
     );
   }
 }

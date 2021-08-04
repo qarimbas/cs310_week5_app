@@ -1,4 +1,5 @@
 import 'package:cs310_week5_app/routes/home.dart';
+import 'package:cs310_week5_app/services/auth.dart';
 import 'package:cs310_week5_app/utils/api.dart';
 import 'package:cs310_week5_app/utils/color.dart';
 import 'package:cs310_week5_app/utils/dimension.dart';
@@ -24,7 +25,7 @@ class _LoginState extends State<Login> {
   String pass = '';
   final _formKey = GlobalKey<FormState>();
 
-  FirebaseAuth auth = FirebaseAuth.instance;
+  final AuthService auth = AuthService();
 
   void getPosts() async {
     //final url = Uri.parse(API.postsURL + '1');
@@ -120,39 +121,12 @@ class _LoginState extends State<Login> {
     print('$name: $uni');
   }
 
-  Future<void> signIn() async {
-    try {
-      UserCredential uc =
-          await auth.signInWithEmailAndPassword(email: mail, password: pass);
-    } on FirebaseAuthException catch (e) {
-      print(e.toString());
-      if (e.code == 'invalid-email') {
-        showAlertDialog('Oops', '${e.message}');
-      } else if (e.code == 'user-disabled') {
-        showAlertDialog('Oops', '${e.message}');
-      } else if (e.code == 'wrong-password') {
-        showAlertDialog('Oops', '${e.message}');
-      } else if (e.code == 'user-not-found') {
-        showAlertDialog('Oops', '${e.message}');
-      }
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     print('initState called');
     attemptCount = 0;
     getData();
-
-    auth.authStateChanges().listen((user) {
-      if (user == null) {
-        print('User is signed out');
-      } else {
-        print('User signed in: ${user.uid}');
-        Navigator.pushNamed(context, '/home');
-      }
-    });
   }
 
   @override
@@ -275,13 +249,22 @@ class _LoginState extends State<Login> {
                       Expanded(
                         flex: 1,
                         child: OutlinedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             //showAlertDialog("Action", 'Button clicked');
                             //getPosts();
 
                             if (_formKey.currentState!.validate()) {
                               _formKey.currentState!.save();
-                              signIn();
+                              var response = await auth.signIn(mail, pass);
+
+                              if (response == null) {
+                                showAlertDialog(
+                                    'Error', 'Unknown error, cannot sign in');
+                              } else if (response.runtimeType is String) {
+                                showAlertDialog('Oops', response);
+                              } else {
+                                Navigator.pushNamed(context, '/home');
+                              }
 
                               setState(() {
                                 attemptCount += 1;
