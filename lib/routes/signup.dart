@@ -22,7 +22,7 @@ class _SignUpState extends State<SignUp> {
   String userName = '';
   final _formKey = GlobalKey<FormState>();
 
-  final AuthService auth = AuthService();
+  AuthService auth = AuthService();
 
   Future<void> signUpUser() async {
     final url = Uri.parse('http://altop.co/cs310/api.php');
@@ -277,20 +277,23 @@ class _SignUpState extends State<SignUp> {
                         flex: 1,
                         child: OutlinedButton(
                           onPressed: () async {
-                            //showAlertDialog("Action", 'Button clicked');
-                            //getPosts();
-
                             if (_formKey.currentState!.validate()) {
                               _formKey.currentState!.save();
-                              var response = await auth.signUp(mail, pass);
 
-                              if (response == null) {
+                              if (pass != pass2) {
                                 showAlertDialog(
-                                    'Error', 'Unknown error, cannot sign up');
-                              } else if (response.runtimeType is String) {
-                                showAlertDialog('Oops', response);
+                                    "Error", 'Passwords must match');
                               } else {
-                                Navigator.pushNamed(context, '/home');
+                                var response = await auth.signUp(mail, pass);
+
+                                if (response == null) {
+                                  showAlertDialog('Error',
+                                      'Unknown error, cannot sign in.');
+                                } else if (response.runtimeType is String) {
+                                  showAlertDialog('Oops', response);
+                                } else {
+                                  Navigator.pushNamed(context, '/home');
+                                }
                               }
                               setState(() {
                                 attemptCount += 1;

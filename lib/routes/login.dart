@@ -1,4 +1,3 @@
-import 'package:cs310_week5_app/routes/home.dart';
 import 'package:cs310_week5_app/services/auth.dart';
 import 'package:cs310_week5_app/utils/api.dart';
 import 'package:cs310_week5_app/utils/color.dart';
@@ -263,7 +262,7 @@ class _LoginState extends State<Login> {
                               } else if (response.runtimeType is String) {
                                 showAlertDialog('Oops', response);
                               } else {
-                                Navigator.pushNamed(context, '/home');
+                                //Navigator.pushNamed(context, '/home');
                               }
 
                               setState(() {
