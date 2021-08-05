@@ -262,7 +262,7 @@ class _LoginState extends State<Login> {
                               } else if (response.runtimeType is String) {
                                 showAlertDialog('Oops', response);
                               } else {
-                                //Navigator.pushNamed(context, '/home');
+                                Navigator.pushNamed(context, '/home');
                               }
 
                               setState(() {
