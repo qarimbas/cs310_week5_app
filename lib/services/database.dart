@@ -25,7 +25,7 @@ class DBService {
 
   List<AppUser?> _userListFromDB(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
-      AppUser(
+      return AppUser(
         name: doc.get('name'),
         date: doc.get('last_login'),
       );

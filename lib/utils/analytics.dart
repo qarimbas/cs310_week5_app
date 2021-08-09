@@ -1,9 +1,12 @@
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:firebase_analytics/firebase_analytics.dart';
 
 Future<void> setCurrentScreen(
     FirebaseAnalytics analytics, String screenName, String className) async {
   await analytics.setCurrentScreen(
-      screenName: screenName, screenClassOverride: className);
+    screenName: screenName,
+    screenClassOverride: className,
+  );
 }
 
 Future<void> setUserId(FirebaseAnalytics analytics, String userID) async {

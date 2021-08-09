@@ -12,6 +12,7 @@ import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cs310_week5_app/services/database.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -287,6 +288,33 @@ class _LoginState extends State<Login> {
                       ),
                     ],
                   ),
+                  Divider(
+                    height: 30,
+                    color: Colors.black,
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: ElevatedButton(
+                              child: Text(
+                                'Sign in anonymously',
+                                style: kButtonDarkTextStyle,
+                              ),
+                              onPressed: () async {
+                                dynamic response = await auth.signInAnon();
+
+                                if (response == null) {
+                                  showAlertDialog('Error',
+                                      'Unknown error, cannot sign in.');
+                                } else if (response.runtimeType is String) {
+                                  showAlertDialog('Oops', response);
+                                } else {
+                                  //Navigator.pushNamed(context, '/home');
+
+                                }
+                              })),
+                    ],
+                  )
                 ],
               ),
             ),

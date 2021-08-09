@@ -1,3 +1,4 @@
+import 'package:cs310_week5_app/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
@@ -11,11 +12,29 @@ class AuthService {
     return _auth.authStateChanges().map(_userFromAuth);
   }
 
+  Future signInAnon() async {
+    try {
+      UserCredential uc = await _auth.signInAnonymously();
+      User? user = uc.user;
+      await DBService(userToken: user!.uid)
+          .createUserData(user.displayName ?? 'Anon User', '2021-08-09');
+      return _userFromAuth(user);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'operation-not-allowed') {
+        return '${e.message}';
+      }
+    } catch (e) {
+      return 'Unknown error: ${e.toString()}';
+    }
+  }
+
   Future signIn(String mail, String pass) async {
     try {
       UserCredential uc =
           await _auth.signInWithEmailAndPassword(email: mail, password: pass);
       User? user = uc.user;
+      await DBService(userToken: user!.uid)
+          .createUserData(user.displayName ?? 'No Name', '2021-08-09');
       return _userFromAuth(user);
     } on FirebaseAuthException catch (e) {
       print(e.toString());
@@ -40,6 +59,8 @@ class AuthService {
       UserCredential uc = await _auth.createUserWithEmailAndPassword(
           email: mail, password: pass);
       User? user = uc.user;
+      await DBService(userToken: user!.uid)
+          .createUserData(user.displayName!, '2021-08-09');
       return _userFromAuth(user);
     } on FirebaseAuthException catch (e) {
       print(e.toString());
