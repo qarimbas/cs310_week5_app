@@ -18,7 +18,8 @@ class MyApp extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          pageController.jumpToPage(0);
+          pageController.nextPage(
+              duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
         },
         child: Icon(Icons.add),
       ),
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
           dummyRow(),
           dummyWrap(),
           tableBuilder(),
+          chipList(),
         ],
       ),
     );
@@ -63,25 +65,49 @@ class MyApp extends StatelessWidget {
   }
 
   Widget dummyWrap() {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      direction: Axis.horizontal,
-      spacing: 2,
-      runSpacing: 4,
-      children: [
-        dummyContainer(),
-        dummyContainer(),
-        dummyContainer(),
-        dummyContainer(),
-        dummyContainer(),
-        dummyContainer(),
-        dummyContainer(),
-        dummyContainer(),
-        dummyContainer(),
-        dummyContainer(),
-        dummyContainer(),
-        dummyContainer(),
-      ],
+    return SingleChildScrollView(
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        direction: Axis.horizontal,
+        spacing: 40,
+        runSpacing: 40,
+        children: [
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+        ],
+      ),
     );
   }
 
@@ -102,6 +128,44 @@ class MyApp extends StatelessWidget {
           dummyWrap(),
           Container(),
         ]),
+      ],
+    );
+  }
+
+  Widget myChip(String title, Color color) {
+    return Chip(
+      label: Text(title),
+      labelStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      labelPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 8),
+      backgroundColor: color,
+      elevation: 6,
+      shadowColor: color.withAlpha(200),
+      avatar: CircleAvatar(
+        backgroundColor: Colors.white70,
+        child: Text(
+          title[0].toUpperCase(),
+          style: TextStyle(color: color, fontWeight: FontWeight.bold),
+        ),
+      ),
+      deleteIcon: Icon(Icons.cancel),
+      deleteIconColor: Colors.white70,
+      onDeleted: () {
+        print('$title delete');
+      },
+    );
+  }
+
+  Widget chipList() {
+    return Wrap(
+      direction: Axis.horizontal,
+      spacing: 6,
+      runSpacing: 6,
+      children: [
+        myChip('Gamer', Color(0xFFff6666)),
+        myChip('Hacker', Color(0xFF007f5c)),
+        myChip('Developer', Color(0xFF5f65d3)),
+        myChip('Racer', Color(0xFF19ca21)),
+        myChip('Traveller', Color(0xFF60230b)),
       ],
     );
   }
