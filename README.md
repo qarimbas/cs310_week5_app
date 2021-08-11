@@ -1,6 +1,6 @@
-# cs310_week5_app
+# cs310_lecture9
 
-A new Flutter application.
+A new Flutter project.
 
 ## Getting Started
 

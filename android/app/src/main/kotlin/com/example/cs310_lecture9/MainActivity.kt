@@ -1,4 +1,4 @@
-package com.example.cs310_week5_app
+package com.example.cs310_lecture9
 
 import io.flutter.embedding.android.FlutterActivity
 
