@@ -12,7 +12,7 @@ class _MessageBoxState extends State<MessageBox> {
   String message = '';
 
   void sendMessage() {
-    print('sending msg');
+    print('Sending message');
   }
 
   @override
@@ -54,7 +54,9 @@ class _MessageBoxState extends State<MessageBox> {
               },
             ),
           ),
-          SizedBox(width: 16),
+          SizedBox(
+            width: 16,
+          ),
           Container(
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(

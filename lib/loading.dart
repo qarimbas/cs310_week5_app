@@ -11,7 +11,7 @@ class Loading extends StatelessWidget {
       child: Center(
         child: SpinKitWave(
           color: Colors.deepOrange,
-          size: 12,
+          size: 64,
         ),
       ),
     );

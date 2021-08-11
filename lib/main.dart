@@ -20,14 +20,14 @@ class _MyAppState extends State<MyApp> {
   int widthCounter = 10;
   bool loading = true;
 
-  void increment() {
+  void _increment() {
     setState(() {
       widthCounter += 10;
     });
   }
 
   Future<void> loadPageData() async {
-    Future.delayed(Duration(seconds: 5), () {
+    Future.delayed(Duration(seconds: 10), () {
       setState(() {
         loading = false;
       });
@@ -42,41 +42,42 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return loading
-        ? Loading()
-        : Scaffold(
-            appBar: AppBar(
-              title: Text('CS310'),
-              centerTitle: true,
-            ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                pageController.nextPage(
-                    duration: Duration(milliseconds: 500),
-                    curve: Curves.easeInOut);
-              },
-              child: Icon(Icons.add),
-            ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerDocked,
-            bottomNavigationBar: BottomAppBar(
-              color: Colors.blueGrey,
-              child: Container(height: 50),
-            ),
-            body: PageView(
-              controller: pageController,
-              scrollDirection: Axis.horizontal,
-              children: [
-                messageViewSetup(),
-                animatedWrap(),
-                dummyContainer(),
-                dummyRow(),
-                dummyWrap(),
-                tableBuilder(),
-                chipList(),
-              ],
-            ),
-          );
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('CS310'),
+        centerTitle: true,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          //pageController.nextPage(duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+          _increment();
+        },
+        child: Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.blueGrey,
+        child: Container(height: 50),
+      ),
+      body: Stack(
+        children: [
+          PageView(
+            controller: pageController,
+            scrollDirection: Axis.horizontal,
+            children: [
+              messageViewSetup(),
+              animatedWrap(),
+              dummyContainer(),
+              dummyRow(),
+              dummyWrap(),
+              tableBuilder(),
+              chipList(),
+            ],
+          ),
+          if (loading) Loading(),
+        ],
+      ),
+    );
   }
 
   Widget messageViewSetup() {
@@ -152,6 +153,20 @@ class _MyAppState extends State<MyApp> {
           dummyContainer(),
           dummyContainer(),
           dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
+          dummyContainer(),
         ],
       ),
     );
@@ -175,6 +190,32 @@ class _MyAppState extends State<MyApp> {
           Container(),
         ]),
       ],
+    );
+  }
+
+  Widget myChip(String title, Color color) {
+    return Chip(
+      label: Text(title),
+      labelStyle: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+      ),
+      labelPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 8),
+      backgroundColor: color,
+      elevation: 6,
+      shadowColor: color.withAlpha(200),
+      avatar: CircleAvatar(
+        backgroundColor: Colors.white70,
+        child: Text(
+          title[0].toUpperCase(),
+          style: TextStyle(color: color, fontWeight: FontWeight.bold),
+        ),
+      ),
+      deleteIcon: Icon(Icons.cancel),
+      deleteIconColor: Colors.white70,
+      onDeleted: () {
+        print('$title delete');
+      },
     );
   }
 
@@ -223,12 +264,12 @@ class _MyAppState extends State<MyApp> {
       spacing: 6,
       runSpacing: 6,
       children: [
-        myInputChip('Gamer', Color(0xFFff6666)),
-        myInputChip('Hacker', Color(0xFF007f5c)),
-        myInputChip('Developer', Color(0xFF5f65d3)),
-        myInputChip('Racer', Color(0xFF19ca21)),
-        myInputChip('Traveller', Color(0xFF60230b)),
-        myInputChip('CS310 student', Color(0xFFc85909)),
+        myChip('Gamer', Color(0xFFff6666)),
+        myChip('Hacker', Color(0xFF007F5c)),
+        myChip('Developer', Color(0xff3a829c)),
+        myChip('Racer', Color(0xFF19ca21)),
+        myChip('Traveller', Color(0xFF60230b)),
+        myInputChip('CS310 Student', Color(0xffc85909)),
       ],
     );
   }
