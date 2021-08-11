@@ -1,3 +1,5 @@
+import 'package:cs310_lecture9/loading.dart';
+import 'package:cs310_lecture9/message_box.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -6,39 +8,83 @@ void main() {
   ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   final pageController = PageController();
+
+  bool _isSelected = false;
+  int widthCounter = 10;
+  bool loading = true;
+
+  void increment() {
+    setState(() {
+      widthCounter += 10;
+    });
+  }
+
+  Future<void> loadPageData() async {
+    Future.delayed(Duration(seconds: 5), () {
+      setState(() {
+        loading = false;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadPageData();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('CS310'),
-        centerTitle: true,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          pageController.nextPage(
-              duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
-        },
-        child: Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.blueGrey,
-        child: Container(height: 50),
-      ),
-      body: PageView(
-        controller: pageController,
-        scrollDirection: Axis.horizontal,
-        children: [
-          dummyContainer(),
-          dummyRow(),
-          dummyWrap(),
-          tableBuilder(),
-          chipList(),
-        ],
-      ),
+    return loading
+        ? Loading()
+        : Scaffold(
+            appBar: AppBar(
+              title: Text('CS310'),
+              centerTitle: true,
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                pageController.nextPage(
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.easeInOut);
+              },
+              child: Icon(Icons.add),
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerDocked,
+            bottomNavigationBar: BottomAppBar(
+              color: Colors.blueGrey,
+              child: Container(height: 50),
+            ),
+            body: PageView(
+              controller: pageController,
+              scrollDirection: Axis.horizontal,
+              children: [
+                messageViewSetup(),
+                animatedWrap(),
+                dummyContainer(),
+                dummyRow(),
+                dummyWrap(),
+                tableBuilder(),
+                chipList(),
+              ],
+            ),
+          );
+  }
+
+  Widget messageViewSetup() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        MessageBox(),
+      ],
     );
   }
 
@@ -132,12 +178,16 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Widget myChip(String title, Color color) {
-    return Chip(
+  Widget myInputChip(String title, Color color) {
+    return InputChip(
       label: Text(title),
-      labelStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      labelStyle: TextStyle(
+        color: _isSelected ? Colors.white : Colors.grey,
+        fontWeight: FontWeight.bold,
+      ),
       labelPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 8),
-      backgroundColor: color,
+      backgroundColor: color.withAlpha(128),
+      selectedColor: color,
       elevation: 6,
       shadowColor: color.withAlpha(200),
       avatar: CircleAvatar(
@@ -147,10 +197,22 @@ class MyApp extends StatelessWidget {
           style: TextStyle(color: color, fontWeight: FontWeight.bold),
         ),
       ),
-      deleteIcon: Icon(Icons.cancel),
+      selected: _isSelected,
+      onSelected: (bool selected) {
+        setState(() {
+          _isSelected = selected;
+        });
+      },
+      deleteIcon: _isSelected ? Icon(Icons.cancel) : Icon(Icons.add),
       deleteIconColor: Colors.white70,
       onDeleted: () {
-        print('$title delete');
+        if (_isSelected) {
+          print('$title delete');
+        } else {
+          setState(() {
+            _isSelected = true;
+          });
+        }
       },
     );
   }
@@ -161,11 +223,27 @@ class MyApp extends StatelessWidget {
       spacing: 6,
       runSpacing: 6,
       children: [
-        myChip('Gamer', Color(0xFFff6666)),
-        myChip('Hacker', Color(0xFF007f5c)),
-        myChip('Developer', Color(0xFF5f65d3)),
-        myChip('Racer', Color(0xFF19ca21)),
-        myChip('Traveller', Color(0xFF60230b)),
+        myInputChip('Gamer', Color(0xFFff6666)),
+        myInputChip('Hacker', Color(0xFF007f5c)),
+        myInputChip('Developer', Color(0xFF5f65d3)),
+        myInputChip('Racer', Color(0xFF19ca21)),
+        myInputChip('Traveller', Color(0xFF60230b)),
+        myInputChip('CS310 student', Color(0xFFc85909)),
+      ],
+    );
+  }
+
+  Widget animatedWrap() {
+    return Wrap(
+      alignment: WrapAlignment.start,
+      children: [
+        AnimatedContainer(
+          duration: Duration(seconds: 1),
+          height: 64,
+          width: (5 * widthCounter) % (MediaQuery.of(context).size.width),
+          color: Colors.blue,
+          curve: Curves.easeInOut,
+        ),
       ],
     );
   }
