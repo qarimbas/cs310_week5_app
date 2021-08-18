@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:cs310_lecture9/util/theme.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -12,9 +13,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: AppTheme.light(context),
+      darkTheme: AppTheme.dark(context),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -53,6 +53,18 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
+            ),
+            TextButton(
+              onPressed: _incrementCounter,
+              child: Text('Increment'),
+            ),
+            OutlinedButton(
+              onPressed: _incrementCounter,
+              child: Text('Increment'),
+            ),
+            ElevatedButton(
+              onPressed: _incrementCounter,
+              child: Text('Increment'),
             ),
           ],
         ),
